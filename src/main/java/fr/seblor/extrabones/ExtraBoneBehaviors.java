@@ -36,10 +36,9 @@ public class ExtraBoneBehaviors extends JavaPlugin {
         CustomBoneBehaviorTypes.MINUTE = BoneBehaviorType.Builder.of(ClockHandBoneBehavior::new, null, "ClockMinute").build();
         CustomBoneBehaviorTypes.SECOND = BoneBehaviorType.Builder.of(ClockHandBoneBehavior::new, null, "ClockSecond").build();
 
-        // SimplePluginManager.fireEvent() skips listeners where plugin.isEnabled() == false.
         // This plugin isn't enabled yet when ModelEngine fires these events (its onEnable()
-        // runs before ours due to depending on ModelEngine).
-        // Fix: using ModelEngine's Plugin instance as the owner — it IS enabled when it
+        // runs before this one due to depending on ModelEngine).
+        // Fix: using ModelEngine's Plugin instance as the owner, it IS enabled when it
         // fires RegisterBehaviorParserEvent / ModelRegistrationEvent from its own onEnable().
         Plugin me = Bukkit.getPluginManager().getPlugin("ModelEngine");
 
