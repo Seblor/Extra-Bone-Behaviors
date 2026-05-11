@@ -1,6 +1,7 @@
 package fr.seblor.extrabones;
 
 import java.time.LocalTime;
+import java.time.ZoneId;
 
 public enum ClockHandMode {
 
@@ -9,11 +10,11 @@ public enum ClockHandMode {
     /** Bone prefix {@code hour_} — snaps once per hour. */
     HOUR {
         @Override
-        public long cacheKey() { return LocalTime.now().getHour(); }
+        public long cacheKey() { return now().getHour(); }
 
         @Override
         public float getDegrees() {
-            return (LocalTime.now().getHour() % 12) / 12f * 360f;
+            return (now().getHour() % 12) / 12f * 360f;
         }
     },
 
@@ -21,13 +22,13 @@ public enum ClockHandMode {
     HOUR_SMOOTH {
         @Override
         public long cacheKey() {
-            LocalTime t = LocalTime.now();
+            LocalTime t = now();
             return (long) t.getHour() * 60 + t.getMinute();
         }
 
         @Override
         public float getDegrees() {
-            LocalTime t = LocalTime.now();
+            LocalTime t = now();
             return ((t.getHour() % 12) * 60 + t.getMinute()) / 720f * 360f;
         }
     },
@@ -39,7 +40,7 @@ public enum ClockHandMode {
 
         @Override
         public float getDegrees() {
-            LocalTime t = LocalTime.now();
+            LocalTime t = now();
             long ms = ((long) (t.getHour() % 12) * 3600 + t.getMinute() * 60L + t.getSecond()) * 1000L
                     + (System.currentTimeMillis() % 1000);
             return ms / 43200000f * 360f;
@@ -51,11 +52,11 @@ public enum ClockHandMode {
     /** Bone prefix {@code minute_} — snaps once per minute. */
     MINUTE {
         @Override
-        public long cacheKey() { return LocalTime.now().getMinute(); }
+        public long cacheKey() { return now().getMinute(); }
 
         @Override
         public float getDegrees() {
-            return LocalTime.now().getMinute() / 60f * 360f;
+            return now().getMinute() / 60f * 360f;
         }
     },
 
@@ -63,13 +64,13 @@ public enum ClockHandMode {
     MINUTE_SMOOTH {
         @Override
         public long cacheKey() {
-            LocalTime t = LocalTime.now();
+            LocalTime t = now();
             return (long) t.getMinute() * 60 + t.getSecond();
         }
 
         @Override
         public float getDegrees() {
-            LocalTime t = LocalTime.now();
+            LocalTime t = now();
             return (t.getMinute() * 60 + t.getSecond()) / 3600f * 360f;
         }
     },
@@ -81,7 +82,7 @@ public enum ClockHandMode {
 
         @Override
         public float getDegrees() {
-            LocalTime t = LocalTime.now();
+            LocalTime t = now();
             long ms = (t.getMinute() * 60L + t.getSecond()) * 1000L
                     + (System.currentTimeMillis() % 1000);
             return ms / 3600000f * 360f;
@@ -93,11 +94,11 @@ public enum ClockHandMode {
     /** Bone prefix {@code second_} — snaps once per second. */
     SECOND {
         @Override
-        public long cacheKey() { return LocalTime.now().getSecond(); }
+        public long cacheKey() { return now().getSecond(); }
 
         @Override
         public float getDegrees() {
-            return LocalTime.now().getSecond() / 60f * 360f;
+            return now().getSecond() / 60f * 360f;
         }
     },
 
@@ -108,7 +109,7 @@ public enum ClockHandMode {
 
         @Override
         public float getDegrees() {
-            LocalTime t = LocalTime.now();
+            LocalTime t = now();
             long ms = t.getSecond() * 1000L + (System.currentTimeMillis() % 1000);
             return ms / 60000f * 360f;
         }
@@ -121,7 +122,7 @@ public enum ClockHandMode {
 
         @Override
         public float getDegrees() {
-            LocalTime t = LocalTime.now();
+            LocalTime t = now();
             long ms = t.getSecond() * 1000L + (System.currentTimeMillis() % 1000);
             return ms / 60000f * 360f;
         }
@@ -143,6 +144,13 @@ public enum ClockHandMode {
      * {@code hour_ss_} matches before {@code hour_s_} and {@code hour_}.
      * Returns {@code null} if the bone carries no clock-hand prefix.
      */
+    /** The timezone used by all clock-hand modes. Set by {@link ExtraBoneBehaviors} from config. */
+    static ZoneId zoneId = ZoneId.systemDefault();
+
+    private static LocalTime now() {
+        return LocalTime.now(zoneId);
+    }
+
     public static ClockHandMode fromBoneName(String name) {
         if (name.startsWith("hour_ss_"))    return HOUR_SUPER_SMOOTH;
         if (name.startsWith("hour_s_"))     return HOUR_SMOOTH;

@@ -1,0 +1,4 @@
+# Timezone used by clock hand bones.
+# Accepts any valid Java ZoneId (e.g. "Europe/Paris", "America/New_York", "Asia/Tokyo", "UTC").
+# Use "system" (or leave blank) to follow the server's own local timezone.
+timezone: "system"

@@ -16,6 +16,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredListener;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.time.ZoneId;
 import java.util.Map;
 
 public class ExtraBoneBehaviors extends JavaPlugin {
@@ -69,6 +70,7 @@ public class ExtraBoneBehaviors extends JavaPlugin {
                             registry.register(CustomBoneBehaviorTypes.MINUTE);
                             registry.register(CustomBoneBehaviorTypes.SECOND);
                         } else if (e.getPhase() == ModelGenerator.Phase.POST_IMPORT && isEnabled()) {
+                            applyConfig();
                             // POST_IMPORT fires on an async thread; schedule the actual entity
                             // manipulation on the main server thread.
                             Bukkit.getScheduler().runTask(ExtraBoneBehaviors.this,
@@ -85,6 +87,23 @@ public class ExtraBoneBehaviors extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
+        saveDefaultConfig();
+        applyConfig();
+    }
+
+    private void applyConfig() {
+        reloadConfig();
+        String tz = getConfig().getString("timezone", "system");
+        if (tz == null || tz.isBlank() || tz.equalsIgnoreCase("system")) {
+            ClockHandMode.zoneId = ZoneId.systemDefault();
+        } else {
+            try {
+                ClockHandMode.zoneId = ZoneId.of(tz);
+            } catch (Exception e) {
+                getLogger().warning("Invalid timezone '" + tz + "' in config.yml — falling back to system default.");
+                ClockHandMode.zoneId = ZoneId.systemDefault();
+            }
+        }
     }
 
     @Override
