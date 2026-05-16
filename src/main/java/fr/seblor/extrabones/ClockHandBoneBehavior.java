@@ -29,14 +29,14 @@ public class ClockHandBoneBehavior extends AbstractBoneBehavior<ClockHandBoneBeh
     }
 
     @Override
-    public void onFinalize() {
+    public void preGlobalCalculation() {
         long key = mode.cacheKey();
         if (key != lastCacheKey) {
             lastCacheKey = key;
             float rad = mode.getDegrees() * 0.017453292F;
             cachedQuaternion.identity().rotateZ(-rad);
         }
-        // Always apply: ModelEngine resets the global transform each tick.
-        this.bone.getGlobalTransform().mutateLeftQuaternion(q -> q.premul((Quaternionfc) cachedQuaternion));
+        // Modify the local transform BEFORE ModelEngine computes the global transform.
+        this.bone.getLocalTransform().mutateLeftQuaternion(q -> q.premul((Quaternionfc) cachedQuaternion));
     }
 }
